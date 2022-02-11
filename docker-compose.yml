@@ -6,10 +6,10 @@ volumes:
   npm-db:
 
 networks:
-  proxy_frontend:
+  frontend:
     # add this if the network is already existing!
     # external: true
-  proxy_backend:
+  backend:
     # add this if the network is already existing!
     # external: true
 
@@ -33,8 +33,8 @@ services:
       - npm-data:/data
       - npm-ssl:/etc/letsencrypt
     networks:
-      - proxy_frontend
-      - proxy_backend
+      - frontend
+      - backend
 
   npm-db:
     image: jc21/mariadb-aria:latest
@@ -47,5 +47,5 @@ services:
     volumes:
       - npm-db:/var/lib/mysql
     networks:
-      - proxy_backend
+      - backend
       
