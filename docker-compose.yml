@@ -48,3 +48,4 @@ services:
       - npm-db:/var/lib/mysql
     networks:
       - proxy_backend
+      
