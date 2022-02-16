@@ -24,7 +24,7 @@ services:
       - "8000:8000"
       - "9443:9443"
       - "9000:9000"
-      - "3080:3080"
+      #- "3080:3080"
     environment:
       - DB_MYSQL_HOST=npm-db
       - DB_MYSQL_PORT=3306
