@@ -25,6 +25,12 @@ services:
       - "9443:9443"
       - "9000:9000"
       #- "3080:3080"
+    healthcheck:
+      test: curl --fail http://localhost || exit 1
+      interval: 300s
+      retries: 5
+      #start_period: 20s
+      timeout: 10s
     environment:
       - DB_MYSQL_HOST=npm-db
       - DB_MYSQL_PORT=3306
@@ -46,6 +52,11 @@ services:
       - MYSQL_DATABASE=npm
       - MYSQL_USER=npm
       - MYSQL_PASSWORD=C4MrisGODYi6WjgA5793Aews4kuciW
+    healthcheck:
+      test: mysql npm --user=root --password=eWiaPGOtaMI5N0sm9ymQ5DlJfem3H4 --execute "SELECT 1;"
+      interval: 30s
+      timeout: 10s
+      retries: 5 
     volumes:
       - npm-db:/var/lib/mysql
     networks:
