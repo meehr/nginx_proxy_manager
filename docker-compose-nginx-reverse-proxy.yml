@@ -60,13 +60,11 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD__FILE: /run/secrets/DB_ROOT_PWD
-      #- MYSQL_ROOT_PASSWORD=eWiaPGOtaMI5N0sm9ymQ5DlJfem3H4
       MYSQL_DATABASE: "npm"
       MYSQL_USER: "npm"
       DB_MYSQL_PASSWORD__FILE: /run/secrets/MYSQL_PWD
-      #- MYSQL_PASSWORD=C4MrisGODYi6WjgA5793Aews4kuciW
     healthcheck:
-      test: mysql npm --user=root --password=$$DB_ROOT_PWD --execute "SELECT 1;"
+      test: ["CMD", "mysqladmin", "-u", "npm", "ping", "-h", "localhost"]
       interval: 30s
       timeout: 10s
       retries: 5 
