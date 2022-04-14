@@ -24,6 +24,7 @@ secrets:
 services:
   npm-app:
     image: jc21/nginx-proxy-manager:latest
+    container_name: npm-app
     restart: unless-stopped
     depends_on:
       - npm-db
@@ -34,7 +35,6 @@ services:
       - "8000:8000"
       - "9443:9443"
       - "9000:9000"
-      #- "3080:3080"
     healthcheck:
       test: ["CMD", "/bin/check-health"]
       interval: 10s
@@ -57,6 +57,7 @@ services:
 
   npm-db:
     image: jc21/mariadb-aria:latest
+    container_name: npm-db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD__FILE: /run/secrets/DB_ROOT_PWD
