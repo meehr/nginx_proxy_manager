@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.9"
 
 volumes:
   npm-data:
@@ -14,8 +14,8 @@ networks:
     # external: true
 
 secrets:
-  # Secrets are single-line text files where the sole content is the secret
-  # Paths in this example assume that secrets are kept in local folder called ".secrets"
+# Secrets are single-line text files where the sole content is the secret
+# Paths in this example assume that secrets are kept in local folder called ".secrets"
   DB_ROOT_PWD:
     file: .secrets/db_root_pwd.txt
   MYSQL_PWD:
@@ -24,28 +24,30 @@ secrets:
 services:
   npm-app:
     image: jc21/nginx-proxy-manager:latest
-    container_name: npm-app
+    container_name: nginx-proxy-app
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 100M
     depends_on:
       - npm-db
     ports:
       - "80:80"
       - "81:81"
       - "443:443"
-      - "8000:8000"
-      - "9443:9443"
-      - "9000:9000"
     healthcheck:
       test: ["CMD", "/bin/check-health"]
       interval: 10s
       timeout: 3s
     environment:
-      DB_MYSQL_HOST: "npm-db"
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "npm"
-      #- DB_MYSQL_PASSWORD=C4MrisGODYi6WjgA5793Aews4kuciW
-      DB_MYSQL_PASSWORD__FILE: /run/secrets/MYSQL_PWD
-      DB_MYSQL_NAME: "npm"
+      - DB_MYSQL_HOST=npm-db
+      - DB_MYSQL_PORT=3306
+      - DB_MYSQL_USER:=npm
+      - DB_MYSQL_PASSWORD__FILE=/run/secrets/MYSQL_PWD
+      - DB_MYSQL_NAME:=npm
     volumes:
       - npm-data:/data
       - npm-ssl:/etc/letsencrypt
@@ -56,14 +58,22 @@ services:
       - backend
 
   npm-db:
-    image: jc21/mariadb-aria:latest
-    container_name: npm-db
+    image: yobasystems/alpine-mariadb:latest
+    container_name: nginx-proxy-db
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+        reservations:
+          memory: 100M
     environment:
-      MYSQL_ROOT_PASSWORD__FILE: /run/secrets/DB_ROOT_PWD
-      MYSQL_DATABASE: "npm"
-      MYSQL_USER: "npm"
-      DB_MYSQL_PASSWORD__FILE: /run/secrets/MYSQL_PWD
+      - MYSQL_ROOT_PASSWORD__FILE:=/run/secrets/DB_ROOT_PWD
+      - MYSQL_DATABASE=npm
+      - MYSQL_USER=npm
+      - MYSQL_PASSWORD__FILE=/run/secrets/MYSQL_PWD
+    expose:
+      - "3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "-u", "npm", "ping", "-h", "localhost"]
       interval: 30s
@@ -76,4 +86,3 @@ services:
       - MYSQL_PWD
     networks:
       - backend
-      
