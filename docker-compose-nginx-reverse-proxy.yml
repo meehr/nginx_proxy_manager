@@ -12,14 +12,6 @@ networks:
   backend:
     # add this if the network is already existing!
     # external: true
-
-secrets:
-# Secrets are single-line text files where the sole content is the secret
-# Paths in this example assume that secrets are kept in local folder called ".secrets"
-  DB_ROOT_PWD:
-    file: .secrets/db_root_pwd.txt
-  MYSQL_PWD:
-    file: .secrets/mysql_pwd.txt
     
 services:
   npm-app:
@@ -29,9 +21,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 200M
+          memory: ${hard_limit}
         reservations:
-          memory: 100M
+          memory: ${soft_limit}
     depends_on:
       - npm-db
     ports:
@@ -43,16 +35,14 @@ services:
       interval: 10s
       timeout: 3s
     environment:
-      - DB_MYSQL_HOST=npm-db
-      - DB_MYSQL_PORT=3306
-      - DB_MYSQL_USER:=npm
-      - DB_MYSQL_PASSWORD__FILE=/run/secrets/MYSQL_PWD
-      - DB_MYSQL_NAME:=npm
+      DB_MYSQL_HOST: ${DB_MYSQL_HOST}
+      DB_MYSQL_PORT: ${DB_MYSQL_PORT}
+      DB_MYSQL_USER: ${DB_MYSQL_USER}
+      DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
+      DB_MYSQL_NAME: ${DB_MYSQL_NAME}
     volumes:
       - npm-data:/data
       - npm-ssl:/etc/letsencrypt
-    secrets:
-      - MYSQL_PWD
     networks:
       - frontend
       - backend
@@ -68,21 +58,18 @@ services:
         reservations:
           memory: 100M
     environment:
-      - MYSQL_ROOT_PASSWORD__FILE:=/run/secrets/DB_ROOT_PWD
-      - MYSQL_DATABASE=npm
-      - MYSQL_USER=npm
-      - MYSQL_PASSWORD__FILE=/run/secrets/MYSQL_PWD
-    expose:
-      - "3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_MYSQL_NAME}
+      MYSQL_USER: ${DB_MYSQL_USER}
+      MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
+    ports:
+      - ${DB_MYSQL_PORT}:3306
     healthcheck:
-      test: ["CMD", "mysqladmin", "-u", "npm", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "-u", "${DB_MYSQL_USER}", "ping", "-h", "localhost"]
       interval: 30s
       timeout: 10s
       retries: 5 
     volumes:
       - npm-db:/var/lib/mysql
-    secrets:
-      - DB_ROOT_PWD
-      - MYSQL_PWD
     networks:
       - backend
