@@ -30,7 +30,7 @@ services:
       - DB_MYSQL_HOST=npm-db
       - DB_MYSQL_PORT=3306
       - DB_MYSQL_USER=npm
-      - DB_MYSQL_PASSWORD={change_me}
+      - DB_MYSQL_PASSWORD=npm
       - DB_MYSQL_NAME=npm
     volumes:
       - npm-data:/data
@@ -40,7 +40,7 @@ services:
       - backend
 
   npm-db:
-    image: jc21/mariadb-aria:latest
+    image: yobasystems/alpine-mariadb:latest
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD={change_me}
