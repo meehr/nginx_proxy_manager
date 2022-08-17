@@ -1,9 +1,9 @@
 version: "3.9"
 
-volumes:
-  npm-data:
-  npm-ssl:
-  npm-db:
+#volumes:
+#  npm-data:
+#  npm-ssl:
+#  npm-db:
 
 networks:
   frontend:
@@ -41,8 +41,14 @@ services:
       DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
       DB_MYSQL_NAME: ${DB_MYSQL_NAME}
     volumes:
-      - npm-data:/data
-      - npm-ssl:/etc/letsencrypt
+      - type: bind
+        source: /mnt/storage/npm/data
+        target: /data
+      - type: bind
+        source: /mnt/storage/npm/letsencrypt
+        target: /etc/letsencrypt
+      #- npm-data:/data
+      #- npm-ssl:/etc/letsencrypt
     networks:
       - frontend
       - backend
@@ -70,6 +76,9 @@ services:
       timeout: 10s
       retries: 5 
     volumes:
-      - npm-db:/var/lib/mysql
+      - type: bind
+        source: /mnt/storage/npm/mysql
+        target: /var/lib/mysql
+      #- npm-db:/var/lib/mysql
     networks:
       - backend
